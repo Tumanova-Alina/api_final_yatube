@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework.relations import PrimaryKeyRelatedField, SlugRelatedField
+from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueTogetherValidator
 
 from posts.models import Comment, Follow, Group, Post, User
@@ -17,10 +17,10 @@ class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
-    post = PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         fields = '__all__'
+        read_only_fields = ('post',)
         model = Comment
 
 
@@ -36,12 +36,12 @@ class FollowSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = '__all__'
+        fields = ('user', 'following')
         model = Follow
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
-                fields=['user', 'following'],
+                fields=('user', 'following',),
                 message='Нельзя подписаться на автора несколько раз!'
             )
         ]
